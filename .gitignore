@@ -1,3 +1,4 @@
 test/
 stash/
 node_modules/
+.idea/

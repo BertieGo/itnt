@@ -1,0 +1,16 @@
+{
+  "name": "itnt",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:BertieGo/itnt.git",
+  "author": "Bertie Huang",
+  "license": "MIT",
+  "bin": {
+    "itnt": "./index.js"
+  },
+  "preferGlobal": true,
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
+  }
+}

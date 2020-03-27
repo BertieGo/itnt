@@ -2,4 +2,5 @@ test/
 stash/
 node_modules/
 .idea/
-.itnt_mainfest.json
+itnt_mainfest.json
+.itnt_config.json

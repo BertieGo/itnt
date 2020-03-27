@@ -1,6 +1,0 @@
-{
-  "entry": "./test",
-  "extname": "js|jsx",
-  "exclude_extname": "spec.js",
-  "output": ""
-}

@@ -1,32 +1,43 @@
 const fs = require('fs');
 const path = require('path');
+const md5 = require('crypto-js/md5');
 const { SYSTEM, REG } = require('../constants');
 
-const getFiles = function(dir) {
+const config = getConfig();
+
+function splitConfig(c) {
+    if (!c) {
+        return [];
+    }
+    return c.split('|');
+}
+
+// 获取所有匹配后缀的文件路径
+const getFilesPath = function(dir) {
     let results = [];
     const list = fs.readdirSync(dir);
     list.forEach(function(file) {
-        // 排除static静态目录（可按你需求进行新增）
-        if (file === 'static') {
-            return false;
-        }
-        file = dir + '/' + file;
-        const stat = fs.statSync(file);
+        const _path = `${dir}/${file}`;
+        const stat = fs.statSync(_path);
         if (stat && stat.isDirectory()) {
-            results = results.concat(getFiles(file))
+            results = results.concat(getFilesPath(_path))
         } else {
-            // 过滤后缀名（可按你需求进行新增）
-            results.push(path.resolve(__dirname, file))
+            const extnameConfigs = splitConfig(config.extname);
+            const excluedeExtnameConfigs = splitConfig(config.exclude_extname);
+            if (
+                extnameConfigs.some(ext => path.extname(_path) === `.${ext}`) &&
+                excluedeExtnameConfigs.every(ext => !file.endsWith(ext))
+            ) {
+                results.push(path.resolve(__dirname, _path))
+            }
         }
     });
     return results;
 };
 
-function readFile(path, callback) {
-    fs.readFile(path, "utf8", (err, data) => {
-        if (err) throw err;
-        callback(data);
-    });
+function readFile(p, callback) {
+    const content = fs.readFileSync(p, "utf8");
+    callback(content);
 }
 
 function rowsConverter(data) {
@@ -103,11 +114,64 @@ function getCurrentSystem() {
     return result;
 }
 
+function getFilesInfo(entryPath) {
+    const result = [];
+    const files = getFilesPath(path.resolve(entryPath));
+
+    files.forEach((p) => {
+        readFile(p, (c) => {
+            const content = handleReplaceAnnotation(c);
+            const reg = new RegExp(`${REG.CHINESE_REG}`, 'g');
+
+            const data = {
+                path: p,
+                content,
+            };
+            const rowsContent = rowsConverter(data);
+            result.push(columnConverter(rowsContent, reg))
+        });
+    });
+    return result;
+}
+
+function handleGenerateManifest(entryDir, outputDir) {
+    const data = getFilesInfo(entryDir);
+    const result = {};
+    data.forEach((f) => {
+        f.forEach((d) => {
+            const hashName = md5(d.match).toString() ;
+            result[hashName] = {
+                ...d
+            }
+        })
+    });
+    const len = Object.keys(result).length;
+    fs.writeFile('itnt_mainfest.json', JSON.stringify(result), 'utf8', (err) => {
+        if (err) throw err;
+        console.log(`文件已被保存, 一共有 ${len} 条数据`);
+    });
+}
+
+function getConfig() {
+    let config = {};
+    try {
+        config = JSON.parse(fs.readFileSync('./.itnt_config.json', 'UTF-8'));
+    } catch (e) {
+        process.exit(1);
+    }
+    return config;
+}
+
+function entry(entryDir, outputDir) {
+    handleGenerateManifest(entryDir, outputDir);
+}
+
 module.exports = {
-    getFiles,
+    getFilesPath,
     readFile,
     rowsConverter,
     columnConverter,
     getLineBreak,
-    handleReplaceAnnotation
+    handleReplaceAnnotation,
+    entry
 };

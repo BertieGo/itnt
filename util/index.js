@@ -136,6 +136,7 @@ function getFilesInfo(entryPath) {
 
 function handleGenerateManifest(entryDir, outputDir) {
     const data = getFilesInfo(entryDir);
+    console.log(data)
     const result = {};
     data.forEach((f) => {
         f.forEach((d) => {

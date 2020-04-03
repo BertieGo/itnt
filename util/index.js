@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const md5 = require('crypto-js/md5');
-const { SYSTEM, REG } = require('../constants');
+const colors = require('colors');
+const { SYSTEM, REG, NOTICE } = require('../constants');
 
 const config = getConfig();
 
@@ -24,9 +25,18 @@ const getFilesPath = function(dir) {
         } else {
             const extnameConfigs = splitConfig(config.extname);
             const excluedeExtnameConfigs = splitConfig(config.exclude_extname);
+
+            const isNeedExtname = extnameConfigs.length > 0;
+            const isNeedExcluedeExtname = excluedeExtnameConfigs.length > 0;
+
+            const isSatisfyExtname = extnameConfigs.some(ext => path.extname(_path) === `.${ext}`);
+            const isSatisfyExcluedeExtname = excluedeExtnameConfigs.every(ext => !file.endsWith(ext));
+
             if (
-                extnameConfigs.some(ext => path.extname(_path) === `.${ext}`) &&
-                excluedeExtnameConfigs.every(ext => !file.endsWith(ext))
+                    (isNeedExtname && isNeedExcluedeExtname) && isSatisfyExtname && isSatisfyExcluedeExtname ||
+                    (!isNeedExtname && !isNeedExcluedeExtname) ||
+                    (!isNeedExtname && isSatisfyExcluedeExtname) ||
+                    (!isNeedExcluedeExtname && isSatisfyExtname)
             ) {
                 results.push(path.resolve(__dirname, _path))
             }
@@ -152,18 +162,50 @@ function handleGenerateManifest(entryDir, outputDir = '') {
     });
 }
 
+function getArgv() {
+    console.log(process.argv)
+    const envArgv = process.argv.slice(2);
+    let env = {};
+    envArgv.forEach(function (e, index) {
+        const content = e.split('=');
+        const [k, v] = content;
+        env[k] = v;
+    });
+    return env;
+}
+
 function getConfig() {
     let config = {};
-    try {
+    const env = getArgv();
+    const configJsonPath = './.itnt_config.json';
+
+    if (fs.existsSync(configJsonPath)) {
         config = JSON.parse(fs.readFileSync('./.itnt_config.json', 'UTF-8'));
-    } catch (e) {
-        process.exit(1);
     }
+
+    if (Object.keys(env).length > 0) {
+        config = Object.assign(config, env);
+    }
+
     return config;
+}
+
+function exit() {
+    process.exit(1);
 }
 
 function entry() {
     const { entry, output } = config;
+    if (!entry) {
+        console.log(`You have not set entry path yet, ${NOTICE.GITHUB}`.red);
+        exit();
+    }
+
+    if (!fs.existsSync(entry)) {
+        console.log(`The entry path is not a exist file or directory, check entry path or ${NOTICE.GITHUB}`.red);
+        exit();
+    }
+
     handleGenerateManifest(entry, output);
 }
 

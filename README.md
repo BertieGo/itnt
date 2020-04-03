@@ -24,7 +24,7 @@ node ./index.js
 - entry: 目标目录
 - extname： 目标文件后缀
 - exclude_extname： 忽略的文件后缀
-- 输出结果 json 文件
+- output： 输出结果 json 文件
 - greed: 是否开启贪婪的匹配模式  
 假如开启：
 ```` 测试${test}代码 ```` 将匹配为一项： ```` 测试${test}代码 ````   

@@ -3,22 +3,23 @@
 
 ### Usage
 
-````angular2html
+````
 node ./index.js
+````
 
 该脚本会根据运行目录下的 ``.itnt_config.json`` 去获得运行配置，然后再根据 config 内的 ``output`` 输出 ``itnt_mainfest.json``
 文件，假如 ``output`` 为空，那么在运行目录下创建该文件。
 
 ### Config
 举例：
-```angular2html
+````
 {
   "entry": "{your path}/coding-frontend/coding-front-v2/packages/enterprise",
   "extname": "js|jsx|ts|tsx",
   "exclude_extname": "spec.js|emojiMap.js",
   "output": ""
 }
-```
+````
 - entry: 目标目录
 - extname： 目标文件后缀
 - exclude_extname： 忽略的文件后缀

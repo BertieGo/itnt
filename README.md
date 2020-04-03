@@ -17,13 +17,19 @@ node ./index.js
   "entry": "{your path}/coding-frontend/coding-front-v2/packages/enterprise",
   "extname": "js|jsx|ts|tsx",
   "exclude_extname": "spec.js|emojiMap.js",
-  "output": ""
+  "output": "",
+  "greed": true
 }
 ````
 - entry: 目标目录
 - extname： 目标文件后缀
 - exclude_extname： 忽略的文件后缀
 - 输出结果 json 文件
+- greed: 是否开启贪婪的匹配模式  
+假如开启：
+```` 测试${test}代码 ```` 将匹配为一项： ```` 测试${test}代码 ````   
+假如关闭：
+```` 测试${test}代码 ```` 将匹配为两项： ```` 测试 ```` ，````代码 ```` 
 
 ### Json
 ```angular2html

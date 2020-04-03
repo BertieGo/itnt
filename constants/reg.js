@@ -4,6 +4,8 @@ const CHINESE_PUNCTUATION_REG = `[\u3002|\uff1f|\uff01|\uff0c|\u3001|\uff1b|\uff
 
 const CHINESE_REG = `${CHINESE_WORD_REG}[^{\`\'\"]*(${CHINESE_WORD_REG})`;
 
+const CHINESE_GREED_REG = `${CHINESE_WORD_REG}[^'"]*(${CHINESE_WORD_REG})`;
+
 const DOUBLE_SLASH_ANNOTATION_REG = /\/\/.*/gm;
 
 const MULTI_LINE_ANNOTATION_REG = /\/\*[^\/]*\*\//gm;
@@ -12,4 +14,5 @@ module.exports = {
     CHINESE_REG,
     DOUBLE_SLASH_ANNOTATION_REG,
     MULTI_LINE_ANNOTATION_REG,
+    CHINESE_GREED_REG
 };

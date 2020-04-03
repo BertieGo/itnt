@@ -117,12 +117,12 @@ function getCurrentSystem() {
 function getFilesInfo(entryPath) {
     const result = [];
     const files = getFilesPath(path.resolve(entryPath));
+    const regContent = config.greed ? REG.CHINESE_GREED_REG : REG.CHINESE_REG;
+    const reg = new RegExp(`${regContent}`, 'g');
 
     files.forEach((p) => {
         readFile(p, (c) => {
             const content = handleReplaceAnnotation(c);
-            const reg = new RegExp(`${REG.CHINESE_REG}`, 'g');
-
             const data = {
                 path: p,
                 content,
@@ -136,7 +136,6 @@ function getFilesInfo(entryPath) {
 
 function handleGenerateManifest(entryDir, outputDir = '') {
     const data = getFilesInfo(entryDir);
-    console.log(data)
     const result = {};
     data.forEach((f) => {
         f.forEach((d) => {
@@ -165,7 +164,7 @@ function getConfig() {
 
 function entry() {
     const { entry, output } = config;
-    handleGenerateManifest(entry, entry);
+    handleGenerateManifest(entry, output);
 }
 
 module.exports = {

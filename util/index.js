@@ -134,7 +134,7 @@ function getFilesInfo(entryPath) {
     return result;
 }
 
-function handleGenerateManifest(entryDir, outputDir) {
+function handleGenerateManifest(entryDir, outputDir = '') {
     const data = getFilesInfo(entryDir);
     console.log(data)
     const result = {};
@@ -147,7 +147,7 @@ function handleGenerateManifest(entryDir, outputDir) {
         })
     });
     const len = Object.keys(result).length;
-    fs.writeFile('itnt_mainfest.json', JSON.stringify(result), 'utf8', (err) => {
+    fs.writeFile(path.join(outputDir, 'itnt_mainfest.json'), JSON.stringify(result), 'utf8', (err) => {
         if (err) throw err;
         console.log(`文件已被保存, 一共有 ${len} 条数据`);
     });
@@ -163,8 +163,9 @@ function getConfig() {
     return config;
 }
 
-function entry(entryDir, outputDir) {
-    handleGenerateManifest(entryDir, outputDir);
+function entry() {
+    const { entry, output } = config;
+    handleGenerateManifest(entry, entry);
 }
 
 module.exports = {

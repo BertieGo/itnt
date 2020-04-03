@@ -1,13 +1,10 @@
-### 提取中文脚本
-
-> 基于 node 开发  
+### itnt - 提取中文脚本 
+> 基于 node 开发, 运行启动命令之前请先关注下面的 Config 和 Json 说明。  
 
 ### Usage
 
 ````angular2html
 node ./index.js
-````
-> 运行该命令之前请先关注下面的 Config 和 Json 说明。  
 
 该脚本会根据运行目录下的 ``.itnt_config.json`` 去获得运行配置，然后再根据 config 内的 ``output`` 输出 ``itnt_mainfest.json``
 文件，假如 ``output`` 为空，那么在运行目录下创建该文件。
@@ -16,10 +13,10 @@ node ./index.js
 举例：
 ```angular2html
 {
-  "entry": "./test",
+  "entry": "{your path}/coding-frontend/coding-front-v2/packages/enterprise",
   "extname": "js|jsx|ts|tsx",
   "exclude_extname": "spec.js|emojiMap.js",
-  "output": "./test"
+  "output": ""
 }
 ```
 - entry: 目标目录

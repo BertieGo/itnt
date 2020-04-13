@@ -127,7 +127,6 @@ function getCurrentSystem() {
         result = SYSTEM[systems.filter(key => SYSTEM[key] === process.platform)[0]];
     } catch (e) {
         result = SYSTEM.WIN;
-        new Error('您使用的开发环境不是 MacOS X、Windows、Linux，请切换开发环境或者提 issue');
     }
     return result;
 }
@@ -167,7 +166,7 @@ function handleGenerateManifest(entryDir, outputDir = '') {
     const len = Object.keys(result).length;
     fs.writeFile(path.join(outputDir, 'itnt_mainfest.json'), JSON.stringify(result), 'utf8', (err) => {
         if (err) throw err;
-        console.log(`文件已被保存, 一共有 ${len} 条数据`);
+        console.log(`文件已被保存, 一共有 ${len} 条数据`.green);
     });
 }
 

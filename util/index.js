@@ -6,6 +6,10 @@ const { SYSTEM, REG, NOTICE } = require('../constants');
 
 const config = getConfig();
 
+function exit() {
+    process.exit(1);
+}
+
 function splitConfig(c) {
     if (!c) {
         return [];
@@ -50,6 +54,7 @@ function readFile(p, callback) {
     callback(content);
 }
 
+// 提取匹配行
 function rowsConverter(data) {
     const result = data.content.toString().split(/(?:\r\n|\r|\n|\\n|\\r|\\r\\n)/g);
     return result.map((row, index) =>({
@@ -59,6 +64,7 @@ function rowsConverter(data) {
     }));
 }
 
+// 提取匹配竖行
 function columnConverter(data, reg) {
     const result = [];
     data.forEach((item) => {
@@ -80,10 +86,11 @@ function columnConverter(data, reg) {
     return result;
 }
 
+// 忽略注释
 function handleReplaceAnnotation(content) {
     let result = '';
 
-    result = content.replace(REG.MULTI_LINE_ANNOTATION_REG, ($1, index, origin) => {
+    result = content.replace(REG.MULTI_LINE_ANNOTATION_REG, ($1) => {
         let r = '';
         const lineLen = $1.split(/\r\n|\r|\n/).length - 1;
 
@@ -97,6 +104,7 @@ function handleReplaceAnnotation(content) {
     return result;
 }
 
+// 兼容多系统换行符
 function getLineBreak() {
     const system = getCurrentSystem();
     switch (system) {
@@ -144,6 +152,7 @@ function getFilesInfo(entryPath) {
     return result;
 }
 
+// 生成 manifest 文件
 function handleGenerateManifest(entryDir, outputDir = '') {
     const data = getFilesInfo(entryDir);
     const result = {};
@@ -162,8 +171,8 @@ function handleGenerateManifest(entryDir, outputDir = '') {
     });
 }
 
+// 获取命令行参数
 function getArgv() {
-    console.log(process.argv)
     const envArgv = process.argv.slice(2);
     let env = {};
     envArgv.forEach(function (e, index) {
@@ -188,10 +197,6 @@ function getConfig() {
     }
 
     return config;
-}
-
-function exit() {
-    process.exit(1);
 }
 
 function entry() {

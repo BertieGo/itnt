@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const md5 = require('crypto-js/md5');
 const colors = require('colors');
-const { SYSTEM, REG, NOTICE } = require('../constants');
+const { SYSTEM, REG, NOTICE, UTF8 } = require('../constants');
 
 const config = getConfig();
 
@@ -54,7 +54,7 @@ function readFile(p, callback) {
     callback(content);
 }
 
-// 提取匹配行
+// 提取所有行
 function rowsConverter(data) {
     const result = data.content.toString().split(/(?:\r\n|\r|\n|\\n|\\r|\\r\\n)/g);
     return result.map((row, index) =>({
@@ -65,8 +65,10 @@ function rowsConverter(data) {
 }
 
 // 提取匹配竖行
-function columnConverter(data, reg) {
+function columnConverter(data, reg, origin, path) {
     const result = [];
+    let originContent = origin;
+
     data.forEach((item) => {
         const content = item.content;
         const match = content.match(reg);
@@ -74,16 +76,33 @@ function columnConverter(data, reg) {
         let matchContent = null;
         if (match) {
             while ((matchContent = reg.exec(content)) !== null) {
+                const currentMatch = match[index];
+                const hash = md5(currentMatch).toString();
+                
+                // 将目标代码替换为 React 代码
+                originContent = replaceMatchContent(originContent, currentMatch, `I18n.get('REGION', ${hash})`); // TODO param
+
                 result.push({
                     ...item,
                     column: matchContent.index,
-                    match: match[index],
+                    match: currentMatch,
                 });
                 index = index + 1;
             }
         }
     });
+    
+    replaceFileContent(path, originContent);
     return result;
+}
+
+
+function replaceMatchContent(content, match, hash) {
+    return content.replace(match, hash);
+}
+
+function replaceFileContent(path, content) {
+    fs.writeFileSync(path, content, UTF8);
 }
 
 // 忽略注释
@@ -138,14 +157,14 @@ function getFilesInfo(entryPath) {
     const reg = new RegExp(`${regContent}`, 'g');
 
     files.forEach((p) => {
-        readFile(p, (c) => {
-            const content = handleReplaceAnnotation(c);
+        readFile(p, (origin) => {
+            const content = handleReplaceAnnotation(origin);
             const data = {
                 path: p,
                 content,
             };
             const rowsContent = rowsConverter(data);
-            result.push(columnConverter(rowsContent, reg))
+            result.push(columnConverter(rowsContent, reg, origin, p))
         });
     });
     return result;
@@ -188,7 +207,7 @@ function getConfig() {
     const configJsonPath = './.itnt_config.json';
 
     if (fs.existsSync(configJsonPath)) {
-        config = JSON.parse(fs.readFileSync('./.itnt_config.json', 'UTF-8'));
+        config = JSON.parse(fs.readFileSync('./.itnt_config.json', UTF8));
     }
 
     if (Object.keys(env).length > 0) {

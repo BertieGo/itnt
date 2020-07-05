@@ -1,5 +1,5 @@
 # itnt
-这是基于 node 开发用于搜索文件内中文的工具，该工具目前支持搜索特定目录下的所有文件，并将匹配到的文件输出到 ``itnt_mainfest.json`` 内，下一步，我将会根据 [rc-i18n](https://github.com/BertieGo/react-i18n) 国际化方案去将匹配到的中文硬编码替换为 React 代码， coming soon...🎉
+这是基于 node 开发用于搜索文件内中文的工具，该工具目前支持搜索特定目录下的所有文件，并将匹配到的文件输出到 ``itnt_mainfest.json`` 内
 
 ## 使用指南
 
